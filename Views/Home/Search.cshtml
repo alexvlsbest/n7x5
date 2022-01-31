@@ -1,0 +1,35 @@
+﻿@model N7.Models.SearchData
+@{
+    ViewBag.Title = SharedLocalizer["Search"];
+}
+
+<head>
+    <link rel="stylesheet" href="~/css/hotels.css" />
+</head>
+
+<body>
+    <h1>@SharedLocalizer["Search"]</h1>
+
+    @using (Html.BeginForm("Search", "Home", FormMethod.Post))
+    {        
+        <div class="searchBoxForm">
+            @Html.TextBoxFor(m => m.SearchText, new { @class = "searchBox" }) <input class="searchBoxSubmit" type="submit" value="">
+        </div>
+
+        @if (Model != null)
+        {
+           
+            <p class="sampleText">
+                @Model.ResultList.TotalCount Results by AzureSearch
+            </p>
+
+            var results = Model.ResultList.GetResults().ToList();
+
+            @for (int i = 0; i < results.Count; i++)
+            {                
+                <h3><a href="/home/detailsItem/@results[i].Document.Id">@results[i].Document.Name</a></h3>                
+            }
+        }
+    }
+</body>
+   

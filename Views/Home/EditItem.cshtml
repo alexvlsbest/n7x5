@@ -1,0 +1,177 @@
+﻿@{
+    ViewBag.Title = SharedLocalizer["Edit Item"];
+}
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
+<script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
+
+<script>
+    $("#autocomplete").autocomplete({
+        source: 'https://localhost:44320/home/autocomplete'
+    });
+</script>
+
+<h1>@SharedLocalizer["Edit Item"]...</h1>
+
+<form action="/home/editItem" method="post">
+
+    <input type="text" style="display:none" name="returnUrl" value="@ViewBag.ReturnUrl" readonly="readonly" class="form-control" />
+    <label  style="display:none" class="control-label">Item Id</label>
+    <input type="text" style="display:none" name="Id" value="@ViewBag.Item.Id" readonly="readonly" class="form-control" />
+    <label style="display:none" class="control-label">AppCollection Id</label>
+    <input type="text" style="display:none" name="AppCollectionId" value="@ViewBag.Item.AppCollectionId" readonly="readonly" class="form-control" />
+    <label class="control-label">@SharedLocalizer["Name"]</label>
+    <input type="text" name="Name" value="@ViewBag.Item.Name" class="form-control" />
+    <input type="datetime-local" style="display:none" name="CreateDate" value="@ViewBag.Item.CreateDate.ToString("yyyy-MM-dd HH:mm:ss").Replace(' ','T')" class="form-control" />
+    <div class="form-group">
+        <label class="control-label">@SharedLocalizer["Tags"]</label>
+        <input type="text" id="autocomplete" name="TagString" value="@ViewBag.TagString" class="form-control" />
+                
+        </div>
+          
+        @{
+            int AppBoolsCounter = 0;
+            int AppDatesCounter = 0;
+            int AppNumbersCounter = 0;
+            int AppStringsCounter = 0;
+            int AppTextsCounter = 0;
+            @foreach (var x in ViewBag.Item.AppCollection.AppHeaders)
+            {
+                <div class="form-group">
+                    <label class="control-label">@x.Name</label>
+                    @switch (x.DataType)
+                    {
+                        case "0":
+                            @for (int i = 0; i < ViewBag.Item.AppBools.Count; i++)
+                            {
+                                if (ViewBag.Item.AppBools[i].AppHeaderId == x.Id)
+                                {
+
+                                    <input style="display:none" type="text" name="appBools[@AppBoolsCounter].Id"
+                                           value="@ViewBag.Item.AppBools[i].Id" class="form-control" />
+                                    <input style="display:none" type="text" name="appBools[@AppBoolsCounter].AppItemId"
+                                           value="@ViewBag.Item.AppBools[i].AppItemId" class="form-control" />
+                                    <input style="display:none" type="text" name="appBools[@AppBoolsCounter].AppHeaderId"
+                                           value="@ViewBag.Item.AppBools[i].AppHeaderId" class="form-control" />
+
+                                    if (ViewBag.Item.AppBools[i].Value)
+                                    {
+                                        <input type="checkbox" name="appBools[@AppBoolsCounter].Value"
+                                               value="true" checked="checked" class="form-control"
+                                               onchange="this.value=this.checked " />
+                                    }
+                                    else
+                                    {
+                                        <input type="checkbox" name="appBools[@AppBoolsCounter].Value"
+                                               value="false" class="form-control"
+                                               onchange="this.value=this.checked" />
+                                    }
+
+
+                                    AppBoolsCounter++;
+                                    break;
+                                }
+
+                            }
+                            break;
+
+
+                        case "1":
+                            @for (int i = 0; i < ViewBag.Item.AppDates.Count; i++)
+                            {
+                                if (ViewBag.Item.AppDates[i].AppHeaderId == x.Id)
+                                {
+
+                                    <input type="text" name="appDates[@AppDatesCounter].Id"
+                                           style="display:none" value="@ViewBag.Item.AppDates[i].Id" class="form-control" />
+                                    <input type="text" name="appDates[@AppDatesCounter].AppItemId"
+                                           style="display:none" value="@ViewBag.Item.AppDates[i].AppItemId" class="form-control" />
+                                    <input type="text" name="appDates[@AppDatesCounter].AppHeaderId"
+                                           style="display:none" value="@ViewBag.Item.AppDates[i].AppHeaderId" class="form-control" />
+                                    <input type="datetime-local" name="appDates[@AppDatesCounter].Value"
+                                           value="@ViewBag.Item.AppDates[i].Value.ToString("yyyy-MM-dd HH:mm:ss").Replace(' ','T')" class="form-control" />
+                                    AppDatesCounter++;
+                                    break;
+                                }
+                            }
+                            break;
+
+                        case "2":
+                            @for (int i = 0; i < ViewBag.Item.AppNumbers.Count; i++)
+                            {
+                                if (ViewBag.Item.AppNumbers[i].AppHeaderId == x.Id)
+                                {
+                                    <input style="display:none" type="text" name="appNumbers[@AppNumbersCounter].Id"
+                                           value="@ViewBag.Item.AppNumbers[i].Id" class="form-control" />
+                                    <input style="display:none" type="text" name="appNumbers[@AppNumbersCounter].AppItemId"
+                                           value="@ViewBag.Item.AppNumbers[i].AppItemId" class="form-control" />
+                                    <input style="display:none" type="text" name="appNumbers[@AppNumbersCounter].AppHeaderId"
+                                           value="@ViewBag.Item.AppNumbers[i].AppHeaderId" class="form-control" />
+                                    <input type="number" name="appNumbers[@AppNumbersCounter].Value"
+                                           value="@ViewBag.Item.AppNumbers[i].Value" class="form-control" />
+                                    AppNumbersCounter++;
+                                    break;
+                                }
+                            }
+                            break;
+
+                        case "3":
+                            @for (int i = 0; i < ViewBag.Item.AppStrings.Count; i++)
+                            {
+                                if (ViewBag.Item.AppStrings[i].AppHeaderId == x.Id)
+                                {
+                                    <input type="text" style="display:none" name="appStrings[@AppStringsCounter].Id"
+                                           value="@ViewBag.Item.AppStrings[i].Id" class="form-control" />
+                                    <input type="text" style="display:none" name="appStrings[@AppStringsCounter].AppItemId"
+                                           value="@ViewBag.Item.AppStrings[i].AppItemId" class="form-control" />
+                                    <input type="text" style="display:none" name="appStrings[@AppStringsCounter].AppHeaderId"
+                                           value="@ViewBag.Item.AppStrings[i].AppHeaderId" class="form-control" />
+                                    <input type="text" name="appStrings[@AppStringsCounter].Value"
+                                           value="@ViewBag.Item.AppStrings[i].Value" class="form-control" />
+                                    AppStringsCounter++;
+                                    break;
+                                }
+                            }
+                            break;
+                        case "4":
+                            @for (int i = 0; i < ViewBag.Item.AppTexts.Count; i++)
+                            {
+                                if (ViewBag.Item.AppTexts[i].AppHeaderId == x.Id)
+                                {
+                                    <input style="display:none" type="text" name="appTexts[@AppTextsCounter].Id"
+                                           value="@ViewBag.Item.AppTexts[i].Id" class="form-control" />
+                                    <input style="display:none" type="text" name="appTexts[@AppTextsCounter].AppItemId"
+                                           value="@ViewBag.Item.AppTexts[i].AppItemId" class="form-control" />
+                                    <input style="display:none" type="text" name="appTexts[@AppTextsCounter].AppHeaderId"
+                                           value="@ViewBag.Item.AppTexts[i].AppHeaderId" class="form-control" />
+                                    <textarea name="appTexts[@AppTextsCounter].Value"
+                                              id="tx-@AppTextsCounter">@ViewBag.Item.AppTexts[i].Value</textarea>
+                                    <script>
+                         new SimpleMDE({
+                            element: document.getElementById("tx-@AppTextsCounter"),
+                           spellChecker: false,
+                         });
+                                    </script>
+                                    AppTextsCounter++;
+                                    break;
+                                }
+                            }
+                            break;
+                    }
+                </div>
+            }
+        }
+    
+            <div class="form-group">
+                <input type="submit" value="OK" class="btn btn-default" />
+            </div>
+</form>
+<script>
+    $("#autocomplete").autocomplete({
+        source: 'https://localhost:44320/home/autocomplete'
+    });
+</script>
+
+<br>
+<br>
+<br>

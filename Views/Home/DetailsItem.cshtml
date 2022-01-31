@@ -1,0 +1,265 @@
+﻿@model N7.Models.AppComment
+@{
+    ViewBag.Title = "\"" + ViewBag.Item.Name + "\"";
+}
+<body>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <script type="text/javascript">
+    $(function () {
+        //alert("start");
+        let timerId = setInterval(function () {
+          //  alert("tick");
+            $.getJSON(window.location.protocol + '//' + location.host + '/Home/FreshComments?id=@ViewBag.Item.Id', function (data) {
+                //alert(data.comments[0].Text);
+                for (var i = 0; i < data.comments.length; i++) {
+                    //alert(data.comments[i].Text);
+                    if (document.getElementById("tx" + data.comments[i].Id) == null) {
+                        //alert(data.comments[i].Text);
+                        $('#page_comments').append(function () {
+                            if (document.getElementById("AdminHere") != null) {
+                                return '<label>' + data.comments[i].AuthorName + ':</label>\n'
+                                    + '<a style="float:right" href="' + location.protocol + '//' + location.host + '\n'
+                                    + '/Home/DeleteComment?commentId=' + data.comments[i].Id + '\n'
+                                    + '&itemNum=' + data.comments[i].AppItemId + '">Delete Comment</a>'
+                                    + '<textarea id="tx' + data.comments[i].Id + '" class="form-control" readonly="readonly">'
+                                    + data.comments[i].Text + '</textarea>';
+                            }
+                            else {
+                                return '<label>' + data.comments[i].AuthorName + ':</label>\n'
+                                    + '<textarea id="tx' + data.comments[i].Id + '" class="form-control" readonly="readonly">'
+                                    + data.comments[i].Text + '</textarea>';
+                            }
+
+                        });
+                    }
+                }
+
+            });
+        }, 5000);
+    });
+    </script>
+
+    <h2>@SharedLocalizer["Item details"]</h2>
+    @if (ViewBag.AuthorHere)
+    {
+    <a href="/home/EditItem?id=@ViewBag.Item.Id&returnUrl=/home/DetailsItem?id=@ViewBag.Item.Id">@SharedLocalizer["Edit"] &nbsp; </a>
+    <a href="/home/DeleteItem?id=@ViewBag.Item.Id">@SharedLocalizer["Delete"]</a>
+    }
+    <br>
+    <b>@SharedLocalizer["Name"]:</b>&nbsp; @ViewBag.Item.Name <br>
+    <b>@SharedLocalizer["Tags"]:</b>&nbsp;
+    @if (ViewBag.TagList != null)
+    {
+            @foreach (var item in ViewBag.TagList)
+            {
+                <a asp-action="FindItems" asp-controller="Home" asp-route-SearchByTag="@item.Text">@item.Text</a>
+            }
+    }
+    <br>
+    <b>@SharedLocalizer["Collection"]:</b>
+    <a asp-action="EditCollectionItems" asp-controller="Home"
+       asp-route-id="@ViewBag.Item.AppCollectionId">@ViewData["CollectionName"]</a><br>
+    <b>@SharedLocalizer["Author"]:</b>&nbsp;<a href="/home/FindCollections?AuthorId=@ViewData["CollectionAuthorId"]">@ViewData["CollectionAuthorName"]</a><br>
+    <b>@SharedLocalizer["Created"]:</b>&nbsp;@ViewBag.CreateDateString<br>
+            
+    @foreach (var x in ViewBag.Item.AppCollection.AppHeaders)
+    {
+         <b>@x.Name: </b>
+         @switch (x.DataType)
+         {
+             case "0":
+                  @for (int i = 0; i < ViewBag.Item.AppBools.Count; i++)
+                  {
+                       if (ViewBag.Item.AppBools[i].AppHeaderId == x.Id)
+                       {
+                             @if (ViewBag.Item.AppBools[i].Value)
+                             {
+                                 <input type="checkbox" 
+                                        checked="checked" disabled="disabled"/>
+                             }
+                             else
+                             {
+                                   <input type="checkbox" disabled="disabled"/>
+                             }                                                                                                           
+                             break;
+                       }
+                   }
+                 break;
+             case "1":
+                   @for (int i = 0; i < ViewBag.Item.AppDates.Count; i++)
+                   {
+                        if (ViewBag.Item.AppDates[i].AppHeaderId == x.Id)
+                        {
+                             @ViewBag.Item.AppDates[i].Value.ToString("dd/MM/yyyy")                                 
+                             break;
+                        }
+                   }
+                 break;
+             case "2":
+                   @for (int i = 0; i < ViewBag.Item.AppNumbers.Count; i++)
+                   {
+                        if (ViewBag.Item.AppNumbers[i].AppHeaderId == x.Id)
+                        {
+                             @ViewBag.Item.AppNumbers[i].Value                                
+                             break;
+                          }
+                    }
+                 break;
+             case "3":
+                    @for (int i = 0; i < ViewBag.Item.AppStrings.Count; i++)
+                    {
+                        if (ViewBag.Item.AppStrings[i].AppHeaderId == x.Id)
+                        {
+                             @ViewBag.Item.AppStrings[i].Value                              
+                             break;
+                        }
+                     }
+                 break;
+             case "4":
+                     @for (int i = 0; i < ViewBag.Item.AppTexts.Count; i++)
+                     {
+                         if (ViewBag.Item.AppTexts[i].AppHeaderId == x.Id)
+                         {
+                              <div id="tx-@i"></div>                              
+                              <script>
+                              document.getElementById('tx-@i').innerHTML =
+                              marked.parse('@ViewBag.Item.AppTexts[i].Value');
+                              </script>
+
+                                  break;
+                         }
+                      }
+                 break;
+          }
+       <br>
+     }
+
+
+    <script>
+    $(function () {
+        $('#LikeButton').click(function () {
+            //alert('OK');
+            $.get(window.location.protocol + '//' + location.host + '/Home/AddLike?ItemId=@ViewBag.Item.Id'
+                + '&AuthorId=' + document.getElementById("CurrentUser").value
+                , function (data) {
+                //$('#news').html(data);
+                    document.getElementById("LikesNumberLabel").remove();
+
+                    $('#LikesNumberDiv').append(function () {
+                        return '<label id="LikesNumberLabel"> ' + data + '</label>';
+
+                    });
+
+                    document.getElementById("LikeButton").style.display = 'none';
+                    document.getElementById("UnLikeButton").style.display = 'inline';
+
+                    //alert(document.getElementById("CurrentUser").value);
+
+            });
+        });
+    });
+                              </script>
+    <script>
+    $(function () {
+        $('#UnLikeButton').click(function () {
+            //alert('Unlike OK');
+            $.get(window.location.protocol + '//' + location.host + '/Home/DeleteLike?ItemId=@ViewBag.Item.Id'
+                + '&AuthorId=' + document.getElementById("CurrentUser").value
+                , function (data) {
+                //$('#news').html(data);
+                    document.getElementById("LikesNumberLabel").remove();
+
+                    $('#LikesNumberDiv').append(function () {
+                        return '<label id="LikesNumberLabel"> ' + data + '</label>';
+
+                    });
+
+                    document.getElementById("UnLikeButton").style.display = 'none';
+                    document.getElementById("LikeButton").style.display = 'inline';
+
+                    //alert(document.getElementById("CurrentUser").value);
+            });
+        });
+    });
+    </script>
+
+    <div id="LikesNumberDiv">
+        Likes:<label id="LikesNumberLabel">&nbsp;@ViewBag.Likes</label>
+    </div>
+
+    @if (User.Identity.IsAuthenticated)
+    {
+        @if (!ViewBag.Liked)
+        {
+            <button id="LikeButton">Like</button>
+            <button id="UnLikeButton" style="display:none">UnLike</button>
+        }
+        else
+        {
+            <button id="LikeButton" style="display:none">Like</button>
+            <button id="UnLikeButton">UnLike</button>
+        }
+    }
+
+    @{
+        if (User.IsInRole("Admin"))
+        {
+            <label id="AdminHere" style="display:none"></label>
+        }
+    }
+
+    <div id="page_comments">
+        @{
+            string a = "";
+            string dc = "";
+            @foreach (var x in ViewBag.Comments)
+            {
+                a = "tx" + x.Id;
+                dc = httpContextaccessor.HttpContext.Request.Scheme + "://" + httpContextaccessor.HttpContext.Request.Host
+                    + "/Home/DeleteComment?commentId=" + x.Id
+                    + "&itemNum=" + x.AppItemId;
+
+                <label>@ViewData[Convert.ToString(x.Id)]:</label>
+
+                if (User.IsInRole("Admin"))
+                {
+                    <a style="float:right" href="@dc">Delete Comment</a>
+                }
+                <textarea id="@a" class="form-control" readonly="readonly">@x.Text</textarea>
+            }
+        }
+    </div>
+
+    @if (User.Identity.IsAuthenticated)
+    {
+        <form asp-action="AddComment" asp-controller="home" asp-route-id="@Model.Id">
+            <div class="form-group">
+
+                <input asp-for="AppItemId" style="display:none" readonly="readonly" />
+
+                @if (User.IsInRole("Admin"))
+                {
+                    <label asp-for="Text" class="control-label">
+                        Author ID:
+                        <input id="CurrentUser" asp-for="AppUserId" />
+                    </label>
+                }
+                else
+                {
+                    <input id="CurrentUser" asp-for="AppUserId" style="display:none" readonly="readonly" />
+                }
+
+                <label asp-for="Text" class="control-label">@SharedLocalizer["Comment"]:</label>
+                <textarea asp-for="Text" class="form-control"></textarea>
+                <input type="submit" value="Save Comment" class="btn btn-default" />
+            </div>
+        </form>
+    }
+
+                
+    <br>
+    <br>
+    <br>
+
+</body>

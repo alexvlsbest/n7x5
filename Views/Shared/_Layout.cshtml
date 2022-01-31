@@ -1,0 +1,246 @@
+﻿@inject IHttpContextAccessor httpContextaccessor
+@using Microsoft.AspNetCore.Builder
+@using Microsoft.AspNetCore.Localization
+@using Microsoft.AspNetCore.Mvc.Localization
+@using Microsoft.Extensions.Options
+
+@inject IViewLocalizer Localizer
+@inject IOptions<RequestLocalizationOptions> LocOptions
+
+@{
+    // получаем сервис IRequestCultureFeature
+    var requestCulture = Context.Features.Get<IRequestCultureFeature>();
+    // получаем список поддерживаемых культур
+    var cultureItems = LocOptions.Value.SupportedUICultures
+        .Select(c => new SelectListItem { Value = c.Name, Text = c.NativeName })
+        .ToList();
+}
+
+@using N7.Models;
+@using N7.ViewModels;
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - N7</title>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/jquery/dist/jquery-ui.min.js"></script>
+    <link rel="stylesheet" href="~/css/jquery-ui.min.css" />
+    <link rel="stylesheet" href="~/css/jquery-ui.structure.min.css" />
+    <link rel="stylesheet" href="~/css/jquery-ui.theme.min.css" />
+    @*<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+
+        <link rel="stylesheet" href="~/css/site.css" />*@
+    @* Syncfusion Essential JS 2 Styles *@
+    <link rel="stylesheet" href="https://cdn.syncfusion.com/ej2/material.css" />
+
+    @* Syncfusion Essential JS 2 Scripts *@
+    <script src="https://cdn.syncfusion.com/ej2/dist/ej2.min.js"></script>
+
+
+    @{
+
+        var theme = "White";
+
+        string partheme0 = httpContextaccessor.HttpContext.Request.Query["theme"].ToString();
+
+        try
+        {
+            theme = httpContextaccessor.HttpContext.Request.Cookies["theme"].ToString();
+        }
+        catch
+        {
+            theme = "White";
+        }
+
+        if ((theme == "Black") && (partheme0 != "White") || (partheme0 == "Black"))
+        {
+
+            <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+            <link  rel="stylesheet" href="~/css/siteblack.css" />
+            <link id="black"/>
+            <script>
+                document.getElementById('requestString').style = "color:white; background-color: #343a40;";
+            </script>
+            <style>
+                .e-grid .e-rowcell.customcss {
+                    background-color: firebrick;
+                    color: white;
+                }
+
+                .e-grid .e-headercell.customcss {
+                    background-color: firebrick;
+                    color: black;
+                }
+            </style>
+
+        }
+        else
+        {
+            <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+            <link rel="stylesheet" href="~/css/site.css" />
+
+        }
+
+    }
+
+
+</head>
+<body>
+    @{
+        string partheme = httpContextaccessor.HttpContext.Request.Query["theme"].ToString();
+
+        var theme2 = ""; var value1 = "dark"; var value2 = "white";
+        var value3 = "#343a40";
+        //var option1 = "option selected"; var option2 = "option";
+        try
+        {
+            theme2 = httpContextaccessor.HttpContext.Request.Cookies["theme"].ToString();
+        }
+        catch
+        {
+            theme2 = "White";
+        }
+
+        if ((theme2 == "Black") && (partheme != "White") || (partheme == "Black"))
+        {
+            value2 = "dark"; value1 = "white"; value3 = "white";
+            //option2 = "selected option"; option1 = "selected";
+        }
+
+
+        <header>
+            <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-@value2 border-bottom box-shadow mb-3">
+                <div class="container">
+                    <a class="navbar-brand bg-@value2 text-@value1" asp-area="" asp-controller="Home" asp-action="Index">N7</a>
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                            aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                        <ul class="navbar-nav flex-grow-1">
+                            <li class="nav-item">
+                                <div style="position:relative;top:8px;">
+                                <a class="nav-link text-@value1" asp-area="" asp-controller="Home"
+                                   asp-action="FindCollections">@SharedLocalizer["Catalog"]</a>
+                                </div>
+                            </li>
+                            @if (User.Identity.IsAuthenticated)
+                            {
+                                <li class="nav-item">
+                                    <div style="position:relative;top:8px;">
+                                    <a class="nav-link text-@value1" asp-area="" 
+                                       asp-controller="Home" asp-action="MyPage">@SharedLocalizer["My Page"]</a>
+                                    </div>
+                                    </li>
+                            }
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <li class="nav-item">
+                                    <div style="position:relative;top:8px;">
+                                    <a class="nav-link text-@value1" asp-area="" 
+                                       asp-controller="Home" asp-action="Details">@SharedLocalizer["Admin"]</a>
+                                    </div>
+                                </li>
+                            }
+                            <li class="nav-item">
+                                <div style="position:relative;top:4px;">
+                                <form action="/Home/Search">
+                                    <label class="nav-link text-@value1">@SharedLocalizer["Search"]: 
+                                    <input id="requestString" name="requestString" type="text" /></label>
+                                </form>
+                                </div>
+                            </li>
+                            <li>
+                            @if (User.Identity.IsAuthenticated)
+                            {
+                                <div style="position:relative; left:20px">
+                                <label>&nbsp;<i> @User.Identity.Name</i></label>
+                                <form method="post" asp-controller="Account" asp-action="Logout">
+                                    <input type="submit" value=@SharedLocalizer["Log_out"] />
+                                 </form>
+                                 </div>   
+                            }
+                            else
+                            {
+                               <div style="position:relative; left:12px; top:12px">
+                                <a asp-controller="Account" asp-action="Login">@SharedLocalizer["Log_in"]</a>
+                                <a asp-controller="Account" asp-action="Register">@SharedLocalizer["Register"]</a>
+                                </div>
+                            }
+                            </li>
+                        </ul>
+
+                        
+
+                            <form asp-controller="Home" asp-action="SetLanguage"
+                                  style="position: relative; left: -50px; top: -4px;"
+                                  asp-route-returnUrl="@Context.Request.Path"
+                                  method="post" class="form-horizontal">
+                                 Language:<select name="culture" onchange="this.form.submit();"
+                                                  asp-for="@requestCulture.RequestCulture.UICulture.Name"
+                                                  asp-items="cultureItems"></select>
+                            </form>
+
+
+
+                            <div class="row text-right">
+                                <label style="position:relative; left: -20px;">
+                                    @SharedLocalizer["Theme"]:
+                                <select name="theme" id="theme" style="background-color:@value2; color:@value3;
+                                                                       ">
+
+                                    <option value="0" style="background-color:@value2; color:@value3">@SharedLocalizer["White"]</option>
+                                    <option value="1" style="background-color:@value2; color:@value3">@SharedLocalizer["Black"]</option>
+                                </select>
+                            </label>
+                            <label>
+                                @SharedLocalizer["Version"]:
+                            <select name="mobileDesktop" id="mobileDesktop" style="background-color:@value2; color:@value3;">
+                                <option value="0" style="background-color:@value2; color:@value3">@SharedLocalizer["Desktop"]</option>
+                                <option value="1" style="background-color:@value2; color:@value3">@SharedLocalizer["Mobile"]</option>
+                            </select>
+                        </label>
+                    </div>
+
+                    </div>
+                </div>
+            </nav>
+
+        </header>
+    }
+    
+
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+              
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <script>        
+        if (document.getElementById('black') != null) {
+            document.getElementById('requestString').style = "color:white; background-color: #343a40;";
+        }
+    </script>
+    
+    @await RenderSectionAsync("Scripts", required: false)
+
+    <!-- Syncfusion Essential JS 2 ScriptManager -->
+    <ejs-scripts></ejs-scripts>
+
+    @RenderBody()
+    @RenderSection("Scripts", required: false)
+    <ejs-scripts></ejs-scripts>
+        
+</body>
+
+</html>

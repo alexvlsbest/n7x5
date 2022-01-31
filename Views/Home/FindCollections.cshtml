@@ -1,0 +1,68 @@
+﻿@model N7.Models.AppCollectionSearch
+@{
+    ViewBag.Title = SharedLocalizer["Collection Search"];
+}
+
+<h4><a asp-action="Authors">@SharedLocalizer["Authors List"]</a></h4>
+<h4><a asp-action="FindItems">@SharedLocalizer["Find Items"]...</a></h4>
+<h1>@SharedLocalizer["Find Collection"]...</h1>
+<form asp-action="XFindCollections" asp-controller="home" asp-route-id="@Model.Id">
+    <label>
+        @SharedLocalizer["Author"]: <input type="text" asp-for="UserName" class="form-control" /></label>
+    <label>
+        @SharedLocalizer["Name"]: <input type="text" asp-for="Name" class="form-control" /></label>
+    <label>
+        @SharedLocalizer["Description"]: <input type="text" asp-for="Details" class="form-control" /></label>
+        <label>
+            @SharedLocalizer["Theme"]: <select asp-for="AppThemeId" asp-items="ViewBag.Themes" class="form-control"></select></label>
+                        <div class="form-group">
+                            <input type="submit" value="OK" class="btn btn-default" />
+                        </div>
+</form>
+
+@if (User.IsInRole("Admin"))
+{
+<a href="/Home/Edit?create=true&returnUrl=@httpContextaccessor.HttpContext.Request.Path@httpContextaccessor.HttpContext.Request.QueryString">
+    @SharedLocalizer["Add Collection"]</a>
+}
+
+    <p>
+        &nbsp;
+    </p>
+
+    <ejs-grid id="Grid" dataSource="@ViewBag.Collections" allowFiltering="true" allowResizing="true" allowPaging="false" allowSorting="true">
+
+        <e-grid-editSettings allowAdding="false" allowDeleting="false" allowEditing="false" mode="Normal"></e-grid-editSettings>
+        <e-grid-filterSettings type="Menu"></e-grid-filterSettings>
+        <e-grid-columns>
+            @if ((!ViewBag.IsMobile) && (User.IsInRole("Admin")))
+            {
+                <e-grid-column template="#temp2" headerText="@SharedLocalizer["Actions"].Value" textAlign="Right" customAttributes=@(new { @class = "customcss" }) width="120"></e-grid-column>
+            }
+            <e-grid-column field="Id" visible="false" headerText="@SharedLocalizer["Collection ID"].Value" textAlign="Right" customAttributes=@(new { @class = "customcss" }) width="120"></e-grid-column>
+            <e-grid-column field="Name" template="#temp" headerText="@SharedLocalizer["Name"].Value" textAlign="Right" customAttributes=@(new { @class = "customcss" }) width="120"></e-grid-column>
+            <e-grid-column field="AppThemeName" headerText="@SharedLocalizer["Theme"].Value" textAlign="Right" customAttributes=@(new { @class = "customcss" }) width="120"></e-grid-column>
+            @if (!ViewBag.IsMobile)
+            {
+                <e-grid-column field="AppUserId" visible="false" headerText="@SharedLocalizer["Author ID"].Value" textAlign="Right" customAttributes=@(new { @class = "customcss" }) width="120"></e-grid-column>
+                <e-grid-column field="UserName" template="#temp4" headerText="@SharedLocalizer["Author"].Value" textAlign="Right" customAttributes=@(new { @class = "customcss" }) width="120"></e-grid-column>
+            }
+        </e-grid-columns>
+    </ejs-grid>
+
+    <script id="temp" type="text/x-template">
+        <a href="/home/EditCollectionItems?id=${Id}">${Name}</a>
+
+    </script>
+    <script id="temp2" type="text/x-template">
+        <a href="/home/Edit?id=${Id}&
+       returnUrl=@httpContextaccessor.HttpContext.Request.Path@httpContextaccessor.HttpContext.Request.QueryString">Edit</a>&nbsp;&nbsp;
+        <a href="/home/DeleteCollection?id=${Id}">Delete</a>
+    </script>
+    <script id="temp4" type="text/x-template">
+        <a href="/home/FindCollections?AuthorId=${AppUserId}">${UserName}</a>
+    </script>
+
+    <br>
+    <br>
+    <br>

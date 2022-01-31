@@ -1,0 +1,101 @@
+﻿@model dynamic
+@{
+    ViewBag.Title = "\"" + ViewBag.Collection.Name + "\"";
+}
+
+<h1>@SharedLocalizer["Collection"] <i>"@ViewBag.Collection.Name"</i> - @SharedLocalizer["Items and Details"]</h1>
+
+@if ((ViewBag.Collection.Image != null) && (ViewBag.Collection.Image != ""))
+{
+    <img src="@ViewBag.Collection.Image" height="200" />
+    <br>
+}
+<b>@SharedLocalizer["Description"]:</b>
+<br>
+<div id="description"></div>
+<b>@SharedLocalizer["Theme"]:</b>  @ViewBag.Theme.Name
+<br>
+<b>@SharedLocalizer["Author"]:</b>  <a href="/home/FindCollections?AuthorId=@ViewBag.Author.Id">@ViewBag.Author.UserName</a>
+<br>
+<br>
+
+@if (ViewBag.AuthorHere || User.IsInRole("Admin"))
+{
+    <a asp-action="CreateItem" asp-route-collectionId="@ViewBag.Collection.Id"
+       asp-route-returnUrl="@httpContextaccessor.HttpContext.Request.Path@httpContextaccessor.HttpContext.Request.QueryString">
+    @SharedLocalizer["Add Item"]</a><b>&nbsp; &nbsp;</b>
+    <a asp-action="Edit" asp-controller="Home" asp-route-id="@ViewBag.Collection.Id"
+       asp-route-returnUrl="/Home/EditCollectionItems/@ViewBag.Collection.Id">
+    @SharedLocalizer["Edit Collection"]</a><b>&nbsp; &nbsp;</b>
+    <a asp-action="DeleteCollection" asp-controller="Home" asp-route-id="@ViewBag.Collection.Id">
+    @SharedLocalizer["Delete Collection"]</a>
+}
+
+<br>
+<br />
+<ejs-grid id="Grid" dataSource=@((System.Data.DataTable)ViewBag.Data) allowFiltering="true" allowResizing="true" allowPaging="false" allowSorting="true">
+
+    <e-grid-editSettings allowAdding="false" allowDeleting="false" allowEditing="false" mode="Normal"></e-grid-editSettings>
+    <e-grid-filterSettings type="Menu"></e-grid-filterSettings>
+    <e-grid-columns>
+    @if ( (!ViewBag.IsMobile) && ((ViewBag.AuthorHere) || (User.IsInRole("Admin")))     )
+    {
+        <e-grid-column template="#temp2" headerText="@SharedLocalizer["Actions"].Value" textAlign="Right" customAttributes=@(new { @class = "customcss" }) width="120"></e-grid-column>
+    }
+        <e-grid-column field="Id" visible="false" headerText="User ID" textAlign="Right" customAttributes=@(new { @class ="customcss" }) width="120"></e-grid-column>
+        <e-grid-column field="Name" template="#temp" headerText="@SharedLocalizer["Name"].Value" textAlign="Right" customAttributes=@(new { @class ="customcss" }) width="120"></e-grid-column>
+        <e-grid-column field="Tags" template="#temp4" headerText="@SharedLocalizer["Tags"].Value" textAlign="Right" customAttributes=@(new { @class ="customcss" }) width="120"></e-grid-column>
+        
+    @if (!ViewBag.IsMobile)
+    {
+        @foreach (var x in ViewBag.AppHeaders)
+        {
+            switch (x.DataType)
+            {
+                case "0":
+                    <e-grid-column field="@x.Id" displayAsCheckBox="true" headerText="@x.Name" textAlign="Right" customAttributes=@(new { @class = "customcss" }) width="120"></e-grid-column>
+                    break;
+                case "1":
+                    <e-grid-column field="@x.Id" customFormat="@(new { type = "date", format = "dd/MM/yyyy" })" type="date" headerText="@x.Name" textAlign="Right" customAttributes=@(new { @class = "customcss" }) width="120"></e-grid-column>
+                    break;
+                case "2":
+                    <e-grid-column field="@x.Id" headerText="@x.Name" textAlign="Right" customAttributes=@(new { @class = "customcss" }) width="120"></e-grid-column>
+                    break;
+                case "3":
+                    <e-grid-column field="@x.Id" headerText="@x.Name" textAlign="Right" customAttributes=@(new { @class = "customcss" }) width="120"></e-grid-column>
+                    break;
+                case "4": continue;
+            }
+        }
+    }
+        @*
+         <e-grid-column field="CreateDate" customFormat="@(new { type ="date", format="dd/MM/yyyy" })" type="date" headerText="@SharedLocalizer["Created"].Value" textAlign="Right" customAttributes=@(new { @class ="customcss" }) width="120"></e-grid-column>
+        @*
+            <e-grid-column field="Date0" customFormat="@(new { type ="date", format="dd/MM/yyyy" })" type="date" headerText="@ViewBag.Collection.Date0Header" textAlign="Right" customAttributes=@(new { @class ="customcss" }) width="120"></e-grid-column>
+            <e-grid-column field="Bool0" displayAsCheckBox="true" headerText="@ViewBag.Collection.Bool0Header" textAlign="Right" customAttributes=@(new { @class ="customcss" }) width="120"></e-grid-column>
+        *@
+    </e-grid-columns>
+</ejs-grid>
+
+<script id="temp" type="text/x-template">
+    <a href="/home/DetailsItem?id=${Id}">${Name}</a>
+
+</script>
+<script id="temp4" type="text/x-template">
+    ${Tags}
+</script>
+<script id="temp2" type="text/x-template">
+    <a href="/home/EditItem?id=${Id}&returnUrl=/home/EditCollectionItems/@ViewBag.Collection.Id">
+    @SharedLocalizer["Edit"]</a>&nbsp;&nbsp;
+    <a href="/home/DeleteItem?id=${Id}">@SharedLocalizer["Delete"]</a>
+</script>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script>
+    document.getElementById('description').innerHTML =
+        marked.parse('@ViewBag.Collection.Details');
+</script>
+
+
+<br>
+<br>
+<br>

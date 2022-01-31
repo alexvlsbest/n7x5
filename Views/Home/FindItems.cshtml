@@ -1,0 +1,63 @@
+﻿@model N7.Models.AppItemSearch
+@{
+    ViewBag.Title = SharedLocalizer["Item Search"];
+}
+
+<h4><a asp-action="Authors">@SharedLocalizer["Authors List"]</a></h4>
+<h4><a asp-action="FindCollections">@SharedLocalizer["Find Collection"]...</a></h4>
+
+<h1>@SharedLocalizer["Find Item"]...</h1>
+
+<form asp-action="XFindItems" asp-controller="home" asp-route-id="@Model.Id">
+    <label>@SharedLocalizer["Author"]: <input type="text" asp-for="UserName" class="form-control" /></label>
+    <label>@SharedLocalizer["Name"]: <input type="text" asp-for="Name" class="form-control" /></label>
+    <label>@SharedLocalizer["Tags"]: <input type="text" asp-for="Tags" class="form-control" /></label>
+    <label>@SharedLocalizer["Collection Name"]: <input type="text" asp-for="CollectionName" class="form-control" /></label>
+    <label>@SharedLocalizer["Theme"]: <select asp-for="AppThemeId" asp-items="@ViewBag.Themes" class="form-control"></select></label>
+    <div class="form-group">
+        <input type="submit" value="OK" class="btn btn-default" />
+    </div>
+</form>
+
+
+<ejs-grid id="Grid" dataSource="@ViewBag.ItemList" allowFiltering="true" allowResizing="true" allowPaging="false" allowSorting="true">
+
+    <e-grid-editSettings allowAdding="false" allowDeleting="false" allowEditing="false" mode="Normal"></e-grid-editSettings>
+    <e-grid-filterSettings type="Menu"></e-grid-filterSettings>
+    <e-grid-columns>
+        <e-grid-column field="Id" visible="false" headerText="@SharedLocalizer["Item ID"].Value" textAlign="Right" customAttributes=@(new { @class ="customcss" }) width="120"></e-grid-column>
+        <e-grid-column field="Name" template="#temp" headerText="@SharedLocalizer["Name"].Value" textAlign="Right" customAttributes=@(new { @class ="customcss" }) width="120"></e-grid-column>
+        
+        <e-grid-column field="Tags" template="#temp5" headerText="@SharedLocalizer["Tags"].Value" textAlign="Right" customAttributes=@(new { @class ="customcss" }) width="120"></e-grid-column>
+           
+        @if (!ViewBag.IsMobile)
+        {
+          <e-grid-column field="AppCollectionId" visible="false" headerText="@SharedLocalizer["Collection ID"].Value" textAlign="Right" customAttributes=@(new { @class = "customcss" }) width="120"></e-grid-column>
+          <e-grid-column field="CollectionName" template="#temp3" headerText="@SharedLocalizer["Collection"].Value" textAlign="Right" customAttributes=@(new { @class = "customcss" }) width="120"></e-grid-column>
+          <e-grid-column field="ThemeName" headerText="@SharedLocalizer["Theme"].Value" textAlign="Right" customAttributes=@(new { @class = "customcss" }) width="120"></e-grid-column>
+
+          <e-grid-column field="AppUserId" visible="false" headerText="@SharedLocalizer["Author ID"].Value" textAlign="Right" customAttributes=@(new { @class = "customcss" }) width="120"></e-grid-column>
+          <e-grid-column field="UserName" template="#temp4" headerText="@SharedLocalizer["Author"].Value" textAlign="Right" customAttributes=@(new { @class = "customcss" }) width="120"></e-grid-column>
+        }
+    </e-grid-columns>
+</ejs-grid>
+
+<script id="temp" type="text/x-template">
+    <a href="/home/DetailsItem?id=${Id}">${Name}</a>
+
+</script>
+<script id="temp3" type="text/x-template">
+    <a href="/home/EditCollectionItems?id=${AppCollectionId}">${CollectionName}</a>
+</script>
+<script id="temp4" type="text/x-template">
+    <a href="/home/FindCollections?AuthorId=${AppUserId}">${UserName}</a>
+</script>
+<script id="temp5" type="text/x-template">
+    ${Tags}
+</script>
+
+
+
+<br>
+<br>
+<br>

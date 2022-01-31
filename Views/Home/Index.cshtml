@@ -1,0 +1,59 @@
+﻿@model IEnumerable<N7.Models.AppUser>
+
+@{
+    ViewBag.Title = "Home Page";
+}
+
+<h3>@SharedLocalizer["Header"]</h3>
+
+<h4>@SharedLocalizer["Last 3 days added items"]:</h4>
+@foreach (var item in ViewBag.ItemList)
+{
+    <a asp-action="DetailsItem" asp-controller="Home" asp-route-id="@item.Id">@item.Name</a><label>;</label>
+}
+
+<h4>@SharedLocalizer["Top 3 biggest collections"]:</h4>
+@foreach (var item in ViewBag.CollectionList)
+{
+    <a asp-action="EditCollectionItems" asp-controller="Home" asp-route-id="@item.Id">@item.Name (@item.Details)</a>
+}
+
+<script src="/js/jquery.awesomeCloud-0.2.js"></script>
+<style type="text/css">
+    .wordcloud {
+        border: none;
+        height: 3in;
+        margin: 0;
+        padding: 0;
+        page-break-after: always;
+        page-break-inside: avoid;
+        width: 7in;
+    }
+</style>
+
+@if (!ViewBag.IsMobile)
+{ 
+<div role="main"><div id="wordcloud1" class="wordcloud">
+       @foreach (var x in ViewBag.TagList) { var a = x.Power > 1 ? 2 : 1; <span data-weight="@a"><a href="/home/FindItems?searchByTag=@x.Text">@x.Text</a></span>} 
+</div></div>
+}
+
+<script>
+    $(document).ready(function () {
+        $("#wordcloud1").awesomeCloud({
+            "size": {
+                "grid": 1,
+                //"normalize": true,
+                "factor": 40
+            },
+            "options": {
+                "color": "random-dark",
+                "rotationRatio": 0.35,
+                "sort": "random"
+            },
+            "font": "'Times New Roman', Times, serif",
+            "shape": "square"
+        });
+
+    });
+</script>

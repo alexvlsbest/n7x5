@@ -1,0 +1,29 @@
+﻿@{
+    ViewBag.Title = User.Identity.Name + " - " + SharedLocalizer["My Collections"];
+}
+
+
+<h3>
+    @User.Identity.Name - @SharedLocalizer["My Collections"]</h3>
+    <a href="/Home/Edit?create=true&returnUrl=@httpContextaccessor.HttpContext.Request.Path@httpContextaccessor.HttpContext.Request.QueryString">
+    @SharedLocalizer["Add Collection"]</a>
+
+    <br>
+    <br>
+    <table class="table">
+        @foreach (var item in ViewBag.Collections)
+        {
+            <tr>
+                <td>
+                <td><a asp-action="EditCollectionItems" asp-controller="Home" asp-route-id="@item.Id">@item.Name</a></td>
+                <td>
+                    <a asp-action="Edit" asp-controller="Home" asp-route-id="@item.Id"
+                       asp-route-returnUrl="@httpContextaccessor.HttpContext.Request.Path">
+                        @SharedLocalizer["Edit"]</a> |
+                    <a asp-action="DeleteCollection" asp-controller="Home"
+                       asp-route-id="@item.Id">@SharedLocalizer["Delete"]</a>
+</td>
+            </tr>
+        }
+    </table>
+    <br>

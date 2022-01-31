@@ -1,0 +1,44 @@
+﻿@model IEnumerable<N7.Models.AppUser>
+@{
+    ViewBag.Title = "Admin Page";
+}
+
+<h2>Admin Page</h2>
+<h4><a asp-controller="Roles" asp-action="Index">@SharedLocalizer["Roles"]</a></h4>
+<h4><a asp-controller="Home" asp-action="AppThemeList">Collection Themes</a></h4>
+
+<div asp-validation-summary="ModelOnly"></div>
+@{
+
+    List<object> toolbarItems = new List<object>();
+    if (User.IsInRole("Admin"))
+    {
+        toolbarItems.Add(new { text = SharedLocalizer["Remove"].Value, tooltipText = SharedLocalizer["Remove"].Value, prefixIcon = "e-expand", id = "Remove" });
+        toolbarItems.Add(new { text = SharedLocalizer["Block"].Value, tooltipText = SharedLocalizer["Block"].Value, prefixIcon = "e-expand", id = "Block" });
+        toolbarItems.Add(new { text = SharedLocalizer["Unblock"].Value, tooltipText = SharedLocalizer["Unblock"].Value, prefixIcon = "e-expand", id = "Unblock" });
+    }
+
+}
+
+<ejs-grid id="Grid" dataSource="@Model" allowFiltering="false" allowResizing="true" allowPaging="false" allowSorting="false" toolbarClick="toolbarClick" toolbar=toolbarItems>
+
+
+    <e-grid-editSettings allowAdding="true" allowDeleting="true" allowEditing="true" mode="Normal"></e-grid-editSettings>
+    <e-grid-columns>
+        <e-grid-column type="checkbox" customAttributes=@(new { @class ="customcss" }) width="50"></e-grid-column>
+        <e-grid-column field="Id" headerText="@SharedLocalizer["User ID"].Value" textAlign="Right" customAttributes=@(new { @class ="customcss" }) width="120"></e-grid-column>
+        <e-grid-column field="UserName" headerText="@SharedLocalizer["Username"].Value" template="#temp" customAttributes=@(new { @class ="customcss" }) textAlign="Right" width="120"></e-grid-column>
+        <e-grid-column field="Email" headerText="@SharedLocalizer["E-mail"].Value" textAlign="Right" customAttributes=@(new { @class ="customcss" }) width="120"></e-grid-column>
+        <e-grid-column field="Blocked" headerText="@SharedLocalizer["Blocked?"].Value" textAlign="Right" customAttributes=@(new { @class ="customcss" }) width="120"></e-grid-column>
+        <e-grid-column field="RegistrationDate" headerText="@SharedLocalizer["Registered"].Value" textAlign="Right" customAttributes=@(new { @class ="customcss" }) width="120"></e-grid-column>
+        <e-grid-column field="LastLoginDate" headerText="@SharedLocalizer["Last visit"].Value" textAlign="Right" customAttributes=@(new { @class ="customcss" }) width="120"></e-grid-column>
+    </e-grid-columns>
+</ejs-grid>
+
+
+<script id="temp" type="text/x-template">
+    <a href="/home/FindCollections?AuthorId=${Id}">${UserName}</a>
+
+</script>
+
+<script src="~/js/home.details.js" asp-append-version="true"></script>

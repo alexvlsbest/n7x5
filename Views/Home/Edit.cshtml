@@ -1,0 +1,149 @@
+﻿@{
+    ViewBag.Title = SharedLocalizer["Edit Collection"];
+}
+
+@if (ViewBag.Action == "create")
+{
+    <h1>
+        @SharedLocalizer["Add Collection"]...
+    </h1>
+}
+else
+{
+    <h1> @SharedLocalizer["Edit Collection"]...</h1>
+}
+<form action="/home/@ViewBag.Action" method="post">
+
+    <input style="display:none" type="text" name="returnUrl" value="@ViewBag.ReturnUrl" readonly="readonly" class="form-control" />
+    <div class="form-group">
+
+        <input style="display:none" type="text" name="appcollection.Id" value="@ViewBag.Collection.Id" readonly="readonly" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label class="control-label">@SharedLocalizer["Name"]</label>
+        <input type="text" name="appcollection.Name" value="@ViewBag.Collection.Name" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label class="control-label">@SharedLocalizer["Details"]</label>
+<textarea id="details" name="appcollection.Details"
+          class="form-control">@ViewBag.Collection.Details</textarea>
+    </div>
+    <div class="form-group">
+        <label class="control-label">@SharedLocalizer["Image"]</label>
+        <input type="text" name="appcollection.Image" value="@ViewBag.Collection.Image" class="form-control" />
+    </div>
+    <div>
+        <label>@SharedLocalizer["Theme"]:</label>
+        <select name="appcollection.AppThemeId" asp-items="@ViewBag.Themes"></select>
+    </div>
+    <div class="form-group">
+
+        <input style="display:none" type="text" name="appcollection.AppUserId" value="@ViewBag.Collection.AppUserId" class="form-control" />
+    </div>
+    <div>
+        <h3>@SharedLocalizer["Items extra fields"]:</h3>
+    </div>
+    <div>
+        <label id="AddField"><b><i> @SharedLocalizer["Add Field"]</i></b></label>
+    </div>
+    <script>
+        $(function () {
+            $('#AddField').click(function () {
+                //alert('OK');
+                var x = document.getElementById("Counter").name;
+                var x0 = Number(x);
+                //alert('OK1');
+                var x2 = x0 + 1;
+                document.getElementById("Counter").name = '' + x2;
+                //alert(document.getElementById("Counter").name);
+                $('#NewFields').append(function () {
+                    //        alert('start');
+                    return '<div id="new' + x + '">\n'
+                        + ' <label id="Del-' + x + '"><b><i>Delete</b></i></label>\n'
+                        + ' <sc' + 'ript> \n'
+                        + '$(function () { \n'
+                        + '$(\'#Del-' + x + '\').click(function () { \n'
+                        + 'document.getElementById("new' + x + '").remove();\n'
+                        + '});\n'
+                        + '});\n'
+                        + '</sc' + 'ript>\n'
+                        + '<label>Data Type:</label>\n'
+                        + '<select name="NewAppHeaders[' + x + '].DataType"><option selected="selected" value="0">Bool</option>\n'
+                        + '<option value="1">Date</option> \n'
+                        + '<option value="2">Number</option> \n'
+                        + '<option value="3">String</option> \n'
+                        + '<option value="4">Text</option> \n'
+                        + '</select> <br>\n'
+                        + '<label class="control-label">Name for New field</label> \n'
+                        + '<input type="text" name="NewAppHeaders[' + x + '].Name" class="form-control" /> \n'
+                        + '</div> \n';
+
+                });
+                //  alert('halt');
+            });
+        });
+    </script>
+
+    @if (ViewBag.Action == "edit")
+    {
+        @for (int i = 0; i < ViewBag.AppHeaders.Count; i++)
+        {
+            <label id="Del-@ViewBag.AppHeaders[i].Id"><b><i>@SharedLocalizer["Delete"]</i></b></label>
+
+            <script>
+        $(function () {
+            $('#Del-@ViewBag.AppHeaders[i].Id').click(function () {
+                //alert('OK');
+                document.getElementById("@ViewBag.AppHeaders[i].Id").setAttribute('value', '');
+                document.getElementById("Old-@ViewBag.AppHeaders[i].Id").style.display = 'none';
+            });
+        });
+            </script>
+
+            <input style="display:none" type="text" name="appcollection.AppHeaders[@i].Id"
+                   value="@ViewBag.AppHeaders[i].Id" class="form-control" />
+            <input style="display:none" type="text" name="appcollection.AppHeaders[@i].DataType"
+                   value="@ViewBag.AppHeaders[i].DataType" class="form-control" />
+
+            <br />
+            <label class="control-label"> @SharedLocalizer["Name for field"]:</label>
+            <input id="@ViewBag.AppHeaders[i].Id" type="text" name="appcollection.AppHeaders[@i].Name"
+                   value="@ViewBag.AppHeaders[i].Name" class="form-control" />
+        }
+    }
+
+    <div id="NewFields">
+        <input id="Counter" name="0" style="display:none" />
+        @*
+            <div id="new">
+            <label>Data Type:</label>
+            <select name="NewAppHeaders[0].DataType" asp-items="ViewBag.DataTypes"></select>
+            <label class="control-label">Name for New field</label>
+            <input type="text" name="NewAppHeaders[0].Name" class="form-control" />
+            </div>
+        *@
+    </div>
+
+    <br>
+    <div class="form-group">
+        <input type="submit" value="OK" class="btn btn-default" />
+    </div>
+</form>
+
+@if (ViewBag.Action == "edit")
+{
+    <a asp-action="editCollectionItems" asp-controller="home"
+     asp-route-id="@ViewBag.Collection.Id">
+    @SharedLocalizer["Edit Items"]</a>
+}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
+<script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
+<script>
+    new SimpleMDE({
+        element: document.getElementById("details"),
+         spellChecker: false,
+     });
+</script>
+<br>
+<br>
+<br>

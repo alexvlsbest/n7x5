@@ -1,0 +1,69 @@
+﻿@model IEnumerable<A>
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Marked in the browser</title>
+</head>
+<body>
+    <div id="content">
+        xxx
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script>
+        document.getElementById('content').innerHTML =
+            marked.parse('# Marked in the browser\n\nRendered by **mar');
+    </script>
+
+    <ejs-grid id="Grid" dataSource="@Model" allowFiltering="true" allowResizing="true" allowPaging="false" allowSorting="true">
+
+        <e-grid-editSettings allowAdding="false" allowDeleting="false" allowEditing="false" mode="Normal"></e-grid-editSettings>
+        <e-grid-filterSettings type="Menu"></e-grid-filterSettings>
+        <e-grid-columns>
+            <e-grid-column field="Name"  headerText="@SharedLocalizer["Name"].Value" textAlign="Right" customAttributes=@(new { @class ="customcss" }) width="120"></e-grid-column>
+            
+            <e-grid-column field="Items"  headerText="@SharedLocalizer["Name"].Value" textAlign="Right" customAttributes=@(new { @class ="customcss" }) width="120"></e-grid-column>
+        </e-grid-columns>
+    </ejs-grid>
+
+
+
+
+
+
+</body>
+</html>
+
+@*
+<head>
+    <style>
+        .editor-preview h1,
+        .editor-preview h2,
+        .editor-preview h3,
+        .editor-preview h4,
+        .editor-preview h5 {
+            margin-bottom: 10px;
+        }
+
+        .editor-preview h1 {
+            border-bottom: 1px solid #ddd;
+        }
+
+        .editor-preview h1 {
+            border-bottom: 1px solid #eee;
+        }
+    </style>
+</head>
+<body>
+<textarea id="demo1"></textarea>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
+    <script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
+    <script>
+        new SimpleMDE({
+            element: document.getElementById("demo1"),
+            spellChecker: false,
+        });
+    </script>
+
+</body>
+*@

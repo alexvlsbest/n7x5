@@ -1,0 +1,33 @@
+﻿@model N7.Models.AppItem
+@{
+    ViewBag.Title = SharedLocalizer["Add Item"];
+}
+
+<h1>@SharedLocalizer["Add Item for"] <i>"@ViewBag.Collection.Name"</i> </h1>
+
+<form asp-action="CreateItem" asp-controller="home"
+      asp-route-returnUrl2="@ViewBag.ReturnUrl">
+    <input type="text" asp-for="AppCollectionId" style="display:none" readonly="readonly" class="form-control" />
+    <div class="form-group">
+        <label asp-for="Name" class="control-label">@SharedLocalizer["Name"]</label>
+        <input type="text" asp-for="Name" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label class="control-label">Tags</label>
+        <input  id="autocomplete" class="form-control">
+    </div>
+
+<div class="form-group">
+    <input type="submit" value="OK" class="btn btn-default" />
+</div>
+</form>
+
+<br>
+<br>
+<br>
+<script>
+    $("#autocomplete").autocomplete({
+        source: window.location.protocol + '//' + location.host + '/home/autocomplete'
+    });
+</script>
+    

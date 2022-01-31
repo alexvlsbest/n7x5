@@ -1,0 +1,31 @@
+﻿@model N7.Models.AppCollection
+@{
+    ViewBag.Title = SharedLocalizer["Add Collection"];
+}
+<h1>@SharedLocalizer["Add Collection"]...</h1>
+
+<form asp-action="create" asp-controller="home">
+    @if (User.IsInRole("Admin"))
+    {
+    <div class="form-group">
+        <label asp-for="AppUserId" class="control-label">Author</label>
+        <input type="text" asp-for="AppUserId" class="form-control" />
+    </div>
+    }
+
+    <div class="form-group">
+        <label asp-for="Name" class="control-label">Name</label>
+        <input type="text" asp-for="Name" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="Details" class="control-label">Details</label>
+        <input type="text" asp-for="Details" class="form-control" />
+    </div>
+    <div>
+        <label asp-for="AppTheme"></label>
+        <select asp-for="AppTheme" asp-items="ViewBag.Themes"></select>
+    </div>
+    <div class="form-group">
+        <input type="submit" value="OK" class="btn btn-default" />
+    </div>
+</form>
